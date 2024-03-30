@@ -1,0 +1,97 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id                String     @id @default(auto()) @map("_id") @db.ObjectId
+  user_name         String     @unique
+  first_name        String
+  last_name         String
+  email             String     @unique
+  phone             String     @unique
+  password          String
+  type              String
+  register_source   String
+  is_email_verified Boolean    @default(false)
+  is_phone_verified Boolean    @default(false)
+  created_at        DateTime   @updatedAt
+  Profile           Profile[]
+  channels          Channels[]
+  rooms             Rooms[]
+  Messages          Messages[]
+}
+
+model Profile {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  user_id     String    @db.ObjectId
+  profile_pic String?
+  address1    String?
+  address2    String?
+  state       String?
+  country     String?
+  zip_code    String?
+  dob         DateTime
+  gender      String
+  about       String
+  pics_urls   String[]
+  intersts    String[]
+  user        Users     @relation(fields: [user_id], references: [id])
+  online      Boolean
+  last_seen   DateTime?
+  public      Boolean
+}
+
+model Channels {
+  id         String     @id @default(auto()) @map("_id") @db.ObjectId
+  owner_id   String     @db.ObjectId
+  owner      Users      @relation(fields: [owner_id], references: [id])
+  created_at DateTime   @updatedAt
+  Messages   Messages[]
+}
+
+model Rooms {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  owner_id    String     @db.ObjectId
+  owner       Users      @relation(fields: [owner_id], references: [id])
+  created_at  DateTime   @updatedAt
+  category_id String     @db.ObjectId
+  category    Categorys  @relation(fields: [category_id], references: [id])
+  title       String
+  Messages    Messages[]
+}
+
+model Messages {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  sender_id  String?  @db.ObjectId
+  sender     Users?   @relation(fields: [sender_id], references: [id])
+  room_id    String?  @db.ObjectId
+  room       Rooms?   @relation(fields: [room_id], references: [id])
+  channel_id String   @db.ObjectId
+  channel    Channels @relation(fields: [channel_id], references: [id])
+  body       String
+  img_url    String
+  created_at DateTime @updatedAt
+}
+
+model Categorys {
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  category String
+  Rooms    Rooms[]
+}
+
+model Tokens {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  token       String   @unique
+  user_id     String
+  expire_time DateTime
+  type        String
+  blacklisted Boolean  @default(false)
+}
