@@ -108,9 +108,23 @@ const deleteUser = async (user_name, email, phone) => {
   }
 };
 
+const getUserById = async (user_id) => {
+  try {
+    const user = await prisma.Users.findUnique({
+      where: {
+        id: user_id,
+      },
+    });
+    return user;
+  } catch (error) {
+    throw new Error(JSON.stringify({ message: "Something went wrong" }));
+  }
+};
+
 
 module.exports = {
   getAllUsers,
   createUser,
   deleteUser,
+  getUserById
 };

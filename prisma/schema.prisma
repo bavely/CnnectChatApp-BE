@@ -24,8 +24,10 @@ model Users {
   is_phone_verified Boolean    @default(false)
   created_at        DateTime   @updatedAt
   Profile           Profile[]
-  channels          Channels[]
-  rooms             Rooms[]
+  channels_ids      String[]   @db.ObjectId
+  channels          Channels[] @relation(fields: [channels_ids], references: [id])
+  rooms             Rooms[]    @relation(fields: [rooms_ids], references: [id])
+  rooms_ids         String[]   @db.ObjectId
   Messages          Messages[]
 }
 
@@ -50,22 +52,24 @@ model Profile {
 }
 
 model Channels {
-  id         String     @id @default(auto()) @map("_id") @db.ObjectId
-  owner_id   String     @db.ObjectId
-  owner      Users      @relation(fields: [owner_id], references: [id])
-  created_at DateTime   @updatedAt
-  Messages   Messages[]
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  owner_id    String     @db.ObjectId
+  members_ids String[]   @db.ObjectId
+  members     Users[]    @relation(fields: [members_ids], references: [id])
+  created_at  DateTime   @updatedAt
+  messages    Messages[]
 }
 
 model Rooms {
   id          String     @id @default(auto()) @map("_id") @db.ObjectId
   owner_id    String     @db.ObjectId
-  owner       Users      @relation(fields: [owner_id], references: [id])
+  members_ids String[]   @db.ObjectId
+  members     Users[]    @relation(fields: [members_ids], references: [id])
   created_at  DateTime   @updatedAt
   category_id String     @db.ObjectId
   category    Categorys  @relation(fields: [category_id], references: [id])
   title       String
-  Messages    Messages[]
+  messages    Messages[]
 }
 
 model Messages {

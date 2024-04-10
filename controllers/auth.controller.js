@@ -4,14 +4,15 @@ const { logIn } = require("../services/auth.service");
 const {accessTokenValidate} = require("../middleware/token");
 
 const register = async (req, res) => {
+
   try {
     const user = await createUser(req.body);
     const token = await generateAuthToken(user.user);
-    res.cookie("refresh_token", token.refresh.refreshToken, {
-      httpOnly: true,
-      sameSite: "none",
-      secure: true,
-    });
+    // res.cookie("refresh_token", token.refresh.refreshToken, {
+    //   httpOnly: true,
+    //   sameSite: "none",
+    //   secure: true,
+    // });
     res.status(201).json({ user, access_token : token.access });
   } catch (error) {
     let errorObj = JSON.parse(error.message);
@@ -22,20 +23,21 @@ const register = async (req, res) => {
 };
 
 const login = async (req, res) => {
+
   try {
     const user_access = req.body.user_name || req.body.email || req.body.phone;
     const password = req.body.password;
     const register_source = req.body.register_source;
     const user = await logIn(user_access, password, register_source);
     const token = await generateAuthToken(user);
-    res.cookie("refresh_token", token.refresh.refreshToken, {
-      httpOnly: true,
-      sameSite: "none",
-      secure: true,
-    });
+    // res.cookie("refresh_token", token.refresh.refreshToken, {
+    //   httpOnly: true,
+    //   sameSite: "none",
+    //   secure: true,
+    // });
     res.status(200).json({ user, access_token : token.access });
   } catch (error) {
-    console.log(error, "From controller");
+ 
     JSON.parse(error.message).message === "User not found" ?
       res.status(404).json({ error: JSON.parse(error.message) }) : res.status(500).json({ error: JSON.parse(error.message) });
   }
